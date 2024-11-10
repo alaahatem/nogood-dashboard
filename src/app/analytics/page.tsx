@@ -1,23 +1,17 @@
 "use client";
 import { Suspense, useEffect, useState } from "react";
 import InteractionsByDateCharts from "./_components/charts/InteractionsByDateChart";
-import { ChartCard, RANGE_DAYS } from "./_components/charts/ChartCardComponent";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { ChartCard } from "./_components/charts/ChartCardComponent";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Activity, BarChart, DollarSign, Users } from "lucide-react";
+import { Activity, BarChart, Users, Clock } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import axios from "axios"; // Import axios
 import { CampaignAd } from "./types/chart";
 
 export default function AnalyticsDashboard() {
-  const router = useRouter(); // Get access to the router
+
 
   const searchParams = useSearchParams(); // Use useSearchParams hook to get query params
   const from = searchParams.get("from");
@@ -31,17 +25,21 @@ export default function AnalyticsDashboard() {
 
     if (from) params.start_date = from;
     if (to) params.end_date = to;
-    
+
     return params;
   };
 
   const fetchCampaigns = async (params: Record<string, string>) => {
     try {
+
       setLoading(true);
       setError(null); // Clear previous errors
-      const response = await axios.get("http://localhost:3000/campaigns", {
-        params,
-      });
+      const response = await axios.get(
+        `http://${process.env.NEXT_PUBLIC_SERVICE_HOST}:3000/campaigns`,
+        {
+          params,
+        }
+      );
       setData(response.data); // Store fetched data in state
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -52,11 +50,10 @@ export default function AnalyticsDashboard() {
   };
   useEffect(() => {
     const params = buildQueryParams(from ?? undefined, to ?? undefined); // Convert null to undefined
-    console.log({params})
+    console.log({ params });
     // Only fetch data if there are query parameters to send
     fetchCampaigns(params);
   }, [from, to]); // Re-fetch if 'from' or 'to' change
-
 
   const totalImpressions = data.reduce(
     (sum, item) => sum + item.impressions,
@@ -102,8 +99,10 @@ export default function AnalyticsDashboard() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Spent</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">
+              Total Spent Time
+            </CardTitle>
+            <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalSpent.toFixed(2)}</div>
@@ -122,38 +121,12 @@ export default function AnalyticsDashboard() {
         </Card>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-6 md:grid-cols-1">
         <ChartCard title="Interactions Line Chart">
           <Suspense fallback={<Skeleton className="w-full h-[300px]" />}>
             <InteractionsByDateCharts data={data} />
           </Suspense>
         </ChartCard>
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
-            <CardDescription>You have 3 unread messages</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-4">
-              <li className="flex items-center">
-                <span className="w-2 h-2 bg-blue-600 rounded-full mr-2"></span>
-                <span className="text-sm">
-                  New campaign "Summer Sale" started
-                </span>
-              </li>
-              <li className="flex items-center">
-                <span className="w-2 h-2 bg-green-600 rounded-full mr-2"></span>
-                <span className="text-sm">Conversion rate increased by 2%</span>
-              </li>
-              <li className="flex items-center">
-                <span className="w-2 h-2 bg-yellow-600 rounded-full mr-2"></span>
-                <span className="text-sm">
-                  Daily budget limit reached for "Brand Awareness" campaign
-                </span>
-              </li>
-            </ul>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );

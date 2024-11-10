@@ -11,7 +11,6 @@ const PortalPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState([]);
   const [filters, setFilters] = useState<{ [key: string]: number }>({});
-  const [search, setSearch] = useState("");
   const [sortOrder, setSortOrder] = useState("asc");
   const [sortBy, setSortBy] = useState("ad_id");
   const [page, setPage] = useState(1);
@@ -19,10 +18,9 @@ const PortalPage = () => {
   const fetchCampaigns = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get("http://localhost:3000/campaigns", {
+      const response = await axios.get(`http://${process.env.NEXT_PUBLIC_SERVICE_HOST}:3000/campaigns`, {
         params: { 
           ...filters,
-          search, 
           sortBy, 
           sortOrder, 
           page, 
@@ -39,7 +37,7 @@ const PortalPage = () => {
 
   useEffect(() => {
     fetchCampaigns();
-  }, [filters, search, sortBy, sortOrder, page]);
+  }, [filters, sortBy, sortOrder, page]);
 
   const handleSort = (column: string) => {
     setSortBy(column);
@@ -52,7 +50,6 @@ const PortalPage = () => {
 
   const handleRefresh = () => {
     setFilters({});
-    setSearch("");
     setSortOrder("asc");
     setSortBy("ad_id");
     setPage(1);
@@ -67,8 +64,6 @@ const PortalPage = () => {
         <CardContent>
           <CampaignActions
             isLoading={isLoading}
-            search={search}
-            onSearchChange={(e) => setSearch(e.target.value)}
             onRefresh={handleRefresh}
             onFilter={handleFilter}
           />

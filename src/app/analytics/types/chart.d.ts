@@ -15,5 +15,7 @@ export type ChartCardProps = {
   title: string;
   children: ReactNode;
 };
-
+type InteractionsByDateChartProps = {
+  data: CampaignAd[];
+};
 export type RangeKey = keyof typeof RANGE_DAYS;

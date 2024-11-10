@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -16,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Filter } from 'lucide-react';
+import { Filter, Plus } from 'lucide-react';
 
 type FilterDropdownProps = {
   onApplyFilter: (filter: { [key: string]: number }) => void;
@@ -26,6 +25,19 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({ onApplyFilter }) => {
   const [key, setKey] = useState<string>('');
   const [operator, setOperator] = useState<string>('');
   const [value, setValue] = useState<string>('');
+  const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) {
+      resetForm();
+    }
+  }, [isOpen]);
+
+  const resetForm = () => {
+    setKey('');
+    setOperator('');
+    setValue('');
+  };
 
   const handleApplyFilter = () => {
     if (key && operator && value) {
@@ -38,22 +50,24 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({ onApplyFilter }) => {
           filterKey += '_lt';
         }
         onApplyFilter({ [filterKey]: numericValue });
+        setIsOpen(false);
+        resetForm();
       }
     }
   };
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
         <Button variant="outline">
           <Filter className="mr-2 h-4 w-4" /> Filter
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56">
-        <DropdownMenuLabel>Filter Campaigns</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <div className="p-2">
-          <Select onValueChange={setKey}>
+      <DropdownMenuContent className="w-72 p-4">
+        <DropdownMenuLabel className="text-lg font-semibold mb-2">Filter Campaigns</DropdownMenuLabel>
+        <DropdownMenuSeparator className="mb-4" />
+        <div className="space-y-4">
+          <Select value={key} onValueChange={setKey}>
             <SelectTrigger>
               <SelectValue placeholder="Select field" />
             </SelectTrigger>
@@ -66,9 +80,7 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({ onApplyFilter }) => {
               <SelectItem value="Total_Conversion">Total Conversion</SelectItem>
             </SelectContent>
           </Select>
-        </div>
-        <div className="p-2">
-          <Select onValueChange={setOperator}>
+          <Select value={operator} onValueChange={setOperator}>
             <SelectTrigger>
               <SelectValue placeholder="Select operator" />
             </SelectTrigger>
@@ -78,18 +90,20 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({ onApplyFilter }) => {
               <SelectItem value="eq">Equal to</SelectItem>
             </SelectContent>
           </Select>
-        </div>
-        <div className="p-2">
           <Input
             type="number"
             placeholder="Enter value"
             value={value}
             onChange={(e) => setValue(e.target.value)}
           />
+          <Button 
+            onClick={handleApplyFilter} 
+            className="w-full"
+            disabled={!key || !operator || !value}
+          >
+            <Plus className="mr-2 h-4 w-4" /> Apply Filter
+          </Button>
         </div>
-        <DropdownMenuItem onSelect={handleApplyFilter}>
-          Apply Filter
-        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

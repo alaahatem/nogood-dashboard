@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { Nav, NavLink } from "@/components/Nav";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -25,16 +26,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-<html lang="en">
-      <body>
-        {/* Navigation should be available across all pages */}
-        <Nav>
-          <NavLink href="/analytics">Dashboard</NavLink>
-          <NavLink href="/portal">Portal</NavLink>
-        </Nav>
-
-        {/* Main content area where children will be rendered */}
-        <div className="container my-6">{children}</div>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${geistSans.variable} ${geistMono.variable} font-sans`}>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <Nav>
+            <NavLink href="/analytics">Dashboard</NavLink>
+            <NavLink href="/portal">Portal</NavLink>
+          </Nav>
+          <main className="container mx-auto my-6 px-4 sm:px-6 lg:px-8">
+            {children}
+          </main>
+        </ThemeProvider>
       </body>
     </html>
   );
