@@ -19,7 +19,7 @@ const PortalPage = () => {
     setIsLoading(true);
     try {
       const response = await axios.get(
-        `http://${process.env.NEXT_PUBLIC_SERVICE_HOST}:3000/campaigns`,
+        `https://${process.env.NEXT_PUBLIC_SERVICE_HOST}:3000/campaigns`,
         {
           params: {
             ...filters,
