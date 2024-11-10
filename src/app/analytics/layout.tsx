@@ -9,10 +9,6 @@ export default function AdminLayout({
 }>) {
   return (
     <>
-      <Nav>
-        <NavLink href="/analytics">Dashboard</NavLink>
-
-      </Nav>
       <div className="container my-6">{children}</div>
     </>
   )

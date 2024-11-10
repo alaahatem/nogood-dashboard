@@ -14,21 +14,15 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import ChartCheckboxDropdown from "./ChartCheckboxDropdown";
 import { RANGE_DAYS } from "./ChartCardComponent";
-import { RangeKey } from "../../types/chart";
+import { CampaignAd, RangeKey } from "../../types/chart";
 
-type DataType = {
-  startDate: string;
-  interest: number;
-  Impressions: number;
-  clicks: number;
-  Spent: number;
-  Total_Conversion: number;
-  Approved_Conversion: number;
-};
 
+type DateSearchParams = {
+  from : string
+  date: string
+}
 type InteractionsByDateChartProps = {
-  data: DataType[];
-  searchParams: string | undefined;
+  data: CampaignAd[];
 };
 const COLORS = [
   "#8884d8",
@@ -41,7 +35,6 @@ const COLORS = [
 
 export default function InteractionsByDateCharts({
   data,
-  searchParams,
 }: InteractionsByDateChartProps) {
   const [selectedKeys, setSelectedKeys] = useState<string[]>(["interest"]);
 
@@ -52,27 +45,8 @@ export default function InteractionsByDateCharts({
         : [...prevKeys, key]
     );
   };
-  const [filteredData, setFilteredData] = useState<DataType[]>(data);
 
-  useEffect(() => {
-    console.log({ searchParams });
-    const rangeKey = searchParams
-    console.log(rangeKey);
-    if (rangeKey && RANGE_DAYS[rangeKey as RangeKey]) {
-      const { startDate, endDate } = RANGE_DAYS[rangeKey as RangeKey];
-
-      const filtered = data.filter((item) => {
-        const itemDate = new Date(item.startDate);
-        return itemDate >= startDate && itemDate <= endDate;
-      });
-      setFilteredData(filtered);
-    } else {
-      // Reset to original data if no range is selected
-      setFilteredData(data);
-    }
-  }, [searchParams]);
-
-  const dataKeys = Object.keys(data[0]).filter((key) => key !== "startDate");
+  const dataKeys = ['impressions', 'clicks' ,'interests']
 
   return (
     <>
@@ -87,7 +61,7 @@ export default function InteractionsByDateCharts({
 
       {/* Chart */}
       <ResponsiveContainer width="100%" minHeight={300}>
-        <LineChart data={filteredData}>
+        <LineChart data={data}>
           <CartesianGrid stroke="hsl(var(--muted))" />
           <XAxis dataKey="startDate" />
           <YAxis />

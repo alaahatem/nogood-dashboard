@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import { Nav, NavLink } from "@/components/Nav";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -24,11 +25,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
+<html lang="en">
+      <body>
+        {/* Navigation should be available across all pages */}
+        <Nav>
+          <NavLink href="/analytics">Dashboard</NavLink>
+          <NavLink href="/portal">Portal</NavLink>
+        </Nav>
+
+        {/* Main content area where children will be rendered */}
+        <div className="container my-6">{children}</div>
       </body>
     </html>
   );

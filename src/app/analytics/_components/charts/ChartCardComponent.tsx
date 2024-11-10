@@ -8,8 +8,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { subDays } from "date-fns";
-import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { format, subDays } from "date-fns";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 export const RANGE_DAYS = {
   last_7_days: {
     label: "Last 7 days",
@@ -22,22 +22,23 @@ export const RANGE_DAYS = {
     endDate: new Date(),
   },
 };
-export function ChartCard({
-  title,
-  children,
-  queryKey,
-}: ChartCardProps & { queryKey: string }) {
-  const searchParams = useSearchParams()
-  const router = useRouter()
-  const pathname = usePathname()
-  console.log(pathname)
-  console.log(searchParams)
 
-  const handleRangeSelect = (key: RangeKey) => {
+type DateRangeValue = {
+  label: string;
+  startDate: Date;
+  endDate: Date;
+};
+export function ChartCard({ title, children }: ChartCardProps) {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const handleRangeSelect = (value: DateRangeValue) => {
+    const { startDate, endDate } = value;
     const currentSearchParams = new URLSearchParams(searchParams.toString());
-    currentSearchParams.set(queryKey, key); 
-
-    router.push(`${pathname}?${currentSearchParams.toString()}`)
+    currentSearchParams.set("from", format(new Date(startDate),"yyyy-MM-dd"));
+    currentSearchParams.set("to", format(new Date(endDate),"yyyy-MM-dd"));
+    router.push(`${pathname}?${currentSearchParams.toString()}`);
   };
   return (
     <Card>
@@ -53,7 +54,7 @@ export function ChartCard({
                 return (
                   <DropdownMenuItem
                     key={key}
-                    onClick={() => handleRangeSelect(key as RangeKey)}
+                    onClick={() => handleRangeSelect(value as DateRangeValue)}
                   >
                     {value.label}
                   </DropdownMenuItem>
