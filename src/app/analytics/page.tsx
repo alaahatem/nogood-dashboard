@@ -5,7 +5,7 @@ import { ChartCard } from "./_components/charts/ChartCardComponent";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Activity, BarChart, Users, Clock } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
+import {useSearchParams } from "next/navigation";
 
 import axios from "axios"; // Import axios
 import { CampaignAd } from "./types/chart";
@@ -18,8 +18,6 @@ export default function AnalyticsDashboard() {
   const to = searchParams.get("to");
 
   const [data, setData] = useState<CampaignAd[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
   const buildQueryParams = (from?: string, to?: string) => {
     const params: Record<string, string> = {};
 
@@ -32,8 +30,6 @@ export default function AnalyticsDashboard() {
   const fetchCampaigns = async (params: Record<string, string>) => {
     try {
 
-      setLoading(true);
-      setError(null); // Clear previous errors
       const response = await axios.get(
         `http://${process.env.NEXT_PUBLIC_SERVICE_HOST}:3000/campaigns`,
         {
@@ -43,9 +39,7 @@ export default function AnalyticsDashboard() {
       setData(response.data); // Store fetched data in state
     } catch (error) {
       console.error("Error fetching data:", error);
-      setError("Failed to fetch campaign data. Please try again later.");
     } finally {
-      setLoading(false);
     }
   };
   useEffect(() => {

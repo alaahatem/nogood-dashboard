@@ -7,9 +7,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { CampaignAd } from "@/app/analytics/types/chart";
 
 type CampaignTableProps = {
-  data: any[];
+  data: CampaignAd[];
   onSort: (column: string) => void;
 };
 

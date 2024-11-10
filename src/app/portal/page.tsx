@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import CampaignTable from "./_components/CampaignTable";
 import CampaignActions from "./_components/CampaignActions";
@@ -15,29 +15,32 @@ const PortalPage = () => {
   const [sortBy, setSortBy] = useState("ad_id");
   const [page, setPage] = useState(1);
 
-  const fetchCampaigns = async () => {
+  const fetchCampaigns = useCallback(async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get(`http://${process.env.NEXT_PUBLIC_SERVICE_HOST}:3000/campaigns`, {
-        params: { 
-          ...filters,
-          sortBy, 
-          sortOrder, 
-          page, 
-          limit: 10 
-        },
-      });
+      const response = await axios.get(
+        `http://${process.env.NEXT_PUBLIC_SERVICE_HOST}:3000/campaigns`,
+        {
+          params: {
+            ...filters,
+            sortBy,
+            sortOrder,
+            page,
+            limit: 10,
+          },
+        }
+      );
       setData(response.data);
     } catch (error) {
       console.error("Failed to fetch campaigns", error);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [filters, sortBy, sortOrder, page]);
 
   useEffect(() => {
     fetchCampaigns();
-  }, [filters, sortBy, sortOrder, page]);
+  }, [fetchCampaigns]);
 
   const handleSort = (column: string) => {
     setSortBy(column);
@@ -59,7 +62,9 @@ const PortalPage = () => {
     <div className="container mx-auto py-10">
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl font-bold">Campaign Management Portal</CardTitle>
+          <CardTitle className="text-2xl font-bold">
+            Campaign Management Portal
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <CampaignActions

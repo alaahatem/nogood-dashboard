@@ -1,6 +1,5 @@
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Loader2, Plus, RefreshCw, Download } from "lucide-react";
+import { Loader2, RefreshCw } from "lucide-react";
 import FilterDropdown from "./FilterDropdown";
 
 type CampaignActionsProps = {
