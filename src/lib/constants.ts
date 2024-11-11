@@ -15,3 +15,5 @@ export const COLORS = [
   "#00C49F",
   "#FFBB28",
 ];
+
+export const SERVICE_HOST = process.env.NEXT_PUBLIC_SERVICE_HOST

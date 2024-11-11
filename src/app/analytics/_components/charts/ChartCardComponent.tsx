@@ -1,6 +1,6 @@
 "use client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChartCardProps } from "../../types/chart";
+import { ChartCardProps } from "@/app/types/chart";
 import {
   DropdownMenu,
   DropdownMenuContent,

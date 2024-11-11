@@ -11,7 +11,7 @@ import {
 } from "recharts";
 import { useState } from "react";
 import ChartCheckboxDropdown from "./ChartCheckboxDropdown";
-import { InteractionsByDateChartProps } from "../../types/chart";
+import { InteractionsByDateChartProps } from "@/app/types/chart";
 import { CHART_DATA_KEYS, COLORS } from "@/lib/constants";
 
 export default function InteractionsByDateCharts({

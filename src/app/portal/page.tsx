@@ -1,56 +1,45 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import axios from "axios";
+import { useState } from "react";
 import CampaignTable from "./_components/CampaignTable";
 import CampaignActions from "./_components/CampaignActions";
 import Pagination from "./_components/Pagination";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useApi } from "@/app/hooks/useApi";
+import { CampaignAd } from "@/app/types/chart";
 
 const PortalPage = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [data, setData] = useState([]);
   const [filters, setFilters] = useState<{ [key: string]: number }>({});
   const [appliedFilters, setAppliedFilters] = useState<
     { key: string; operator: string; value: number }[]
   >([]);
-  const [sortOrder, setSortOrder] = useState("asc");
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [sortBy, setSortBy] = useState("ad_id");
   const [page, setPage] = useState(1);
 
-  const fetchCampaigns = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const response = await axios.get(`http://localhost:3000/campaigns`, {
-        params: {
-          ...filters,
-          sortBy,
-          sortOrder,
-          page,
-          limit: 10,
-        },
-      });
-      setData(response.data);
-    } catch (error) {
-      console.error("Failed to fetch campaigns", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [filters, sortBy, sortOrder, page]);
-
-  useEffect(() => {
-    fetchCampaigns();
-  }, [fetchCampaigns]);
+  const { data, isLoading, error } = useApi<CampaignAd[]>({
+    endpoint: '/campaigns',
+    params: {
+      ...filters,
+      sortBy,
+      sortOrder,
+      page,
+      limit: 10,
+    },
+  });
 
   const handleSort = (column: string) => {
-    setSortBy(column);
-    setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+    if (sortBy === column) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(column);
+      setSortOrder('asc');
+    }
   };
 
   const handleFilter = (newFilter: { [key: string]: number }) => {
     setFilters((prevFilters) => ({ ...prevFilters, ...newFilter }));
 
-    // Store applied filters
     const [key, value] = Object.entries(newFilter)[0];
     const [field, operator] = key.split("_");
 
@@ -74,7 +63,7 @@ const PortalPage = () => {
   const handleRefresh = () => {
     setFilters({});
     setAppliedFilters([]);
-    setSortOrder("asc");
+    setSortOrder('asc');
     setSortBy("ad_id");
     setPage(1);
   };
@@ -95,7 +84,13 @@ const PortalPage = () => {
             appliedFilters={appliedFilters}
             onRemoveFilter={handleRemoveFilter}
           />
-          <CampaignTable data={data} onSort={handleSort} />
+          {error && <div className="text-red-500 mb-4">Error: {error.message}</div>}
+          <CampaignTable 
+            data={data ?? []} 
+            onSort={handleSort} 
+            sortBy={sortBy} 
+            sortOrder={sortOrder}
+          />
           <Pagination page={page} onPageChange={setPage} />
         </CardContent>
       </Card>

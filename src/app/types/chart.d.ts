@@ -1,6 +1,7 @@
-import { RANGE_DAYS } from "../_components/charts/ChartCardComponent";
+import { RANGE_DAYS } from "../analytics/_components/charts/ChartCardComponent";
 
 export type CampaignAd = {
+  ad_id: number
   start_date: string;
   end_date: string;
   interest: number;
