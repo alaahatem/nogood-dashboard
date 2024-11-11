@@ -11,6 +11,9 @@ const PortalPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState([]);
   const [filters, setFilters] = useState<{ [key: string]: number }>({});
+  const [appliedFilters, setAppliedFilters] = useState<
+    { key: string; operator: string; value: number }[]
+  >([]);
   const [sortOrder, setSortOrder] = useState("asc");
   const [sortBy, setSortBy] = useState("ad_id");
   const [page, setPage] = useState(1);
@@ -18,18 +21,15 @@ const PortalPage = () => {
   const fetchCampaigns = useCallback(async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get(
-        `https://${process.env.NEXT_PUBLIC_SERVICE_HOST}/campaigns`,
-        {
-          params: {
-            ...filters,
-            sortBy,
-            sortOrder,
-            page,
-            limit: 10,
-          },
-        }
-      );
+      const response = await axios.get(`http://localhost:3000/campaigns`, {
+        params: {
+          ...filters,
+          sortBy,
+          sortOrder,
+          page,
+          limit: 10,
+        },
+      });
       setData(response.data);
     } catch (error) {
       console.error("Failed to fetch campaigns", error);
@@ -49,10 +49,31 @@ const PortalPage = () => {
 
   const handleFilter = (newFilter: { [key: string]: number }) => {
     setFilters((prevFilters) => ({ ...prevFilters, ...newFilter }));
+
+    // Store applied filters
+    const [key, value] = Object.entries(newFilter)[0];
+    const [field, operator] = key.split("_");
+
+    setAppliedFilters((prev) => [
+      ...prev,
+      { key: field, operator, value: value as number },
+    ]);
+  };
+
+  const handleRemoveFilter = (filterKey: string) => {
+    setAppliedFilters((prev) =>
+      prev.filter((filter) => filter.key !== filterKey)
+    );
+    const updatedFilters = { ...filters };
+    delete updatedFilters[`${filterKey}_gt`];
+    delete updatedFilters[`${filterKey}_lt`];
+    delete updatedFilters[`${filterKey}_eq`];
+    setFilters(updatedFilters);
   };
 
   const handleRefresh = () => {
     setFilters({});
+    setAppliedFilters([]);
     setSortOrder("asc");
     setSortBy("ad_id");
     setPage(1);
@@ -71,6 +92,8 @@ const PortalPage = () => {
             isLoading={isLoading}
             onRefresh={handleRefresh}
             onFilter={handleFilter}
+            appliedFilters={appliedFilters}
+            onRemoveFilter={handleRemoveFilter}
           />
           <CampaignTable data={data} onSort={handleSort} />
           <Pagination page={page} onPageChange={setPage} />

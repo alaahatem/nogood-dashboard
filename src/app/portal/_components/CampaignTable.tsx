@@ -36,7 +36,6 @@ const CampaignTable: React.FC<CampaignTableProps> = ({ data, onSort }) => {
                   </DropdownMenu>
                 </TableHead>
               ))}
-            <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -45,10 +44,6 @@ const CampaignTable: React.FC<CampaignTableProps> = ({ data, onSort }) => {
               {Object.values(row).map((value, cellIndex) => (
                 <TableCell key={cellIndex}>{value as React.ReactNode}</TableCell>
               ))}
-              <TableCell>
-                <Button variant="ghost" size="sm">Edit</Button>
-                <Button variant="ghost" size="sm" className="text-red-500">Delete</Button>
-              </TableCell>
             </TableRow>
           ))}
         </TableBody>

@@ -43,11 +43,10 @@ export default function InteractionsByDateCharts({
       <ResponsiveContainer width="100%" minHeight={300}>
         <LineChart data={data}>
           <CartesianGrid stroke="hsl(var(--muted))" />
-          <XAxis dataKey="startDate" />
+          <XAxis dataKey="start_date" />
           <YAxis />
           <Tooltip />
           <Legend />
-          {/* Dynamically render Line components based on selected keys */}
           {selectedKeys.map((key, index) => (
             <Line
               key={key}
