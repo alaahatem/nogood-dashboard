@@ -1,35 +1,36 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useState, useEffect, useCallback } from 'react';
+import axios, { AxiosError } from 'axios';
 import { SERVICE_HOST } from '@/lib/constants';
 
-interface ApiOptions {
+interface ApiOptions<T> {
   endpoint: string;
-  params?: Record<string, any>;
-  initialData?: any;
+  params?: Record<string, string | number | boolean | undefined>;
+  initialData?: T;
 }
 
-export function useApi<T>({ endpoint, params = {}, initialData = null }: ApiOptions) {
-  const [data, setData] = useState<T | null>(initialData);
+export function useApi<T>({ endpoint, params = {}, initialData }: ApiOptions<T>) {
+  const [data, setData] = useState<T | null>(initialData ?? null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        const response = await axios.get<T>(`https://${SERVICE_HOST}${endpoint}`, { params });
-        setData(response.data);
-        setError(null);
-      } catch (err) {
-        setError(err instanceof Error ? err : new Error('An error occurred'));
-        console.error(`Failed to fetch data from ${endpoint}`, err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const fetchData = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const response = await axios.get<T>(`https://${SERVICE_HOST}${endpoint}`, { params });
+      setData(response.data);
+      setError(null);
+    } catch (err) {
+      const error = err as Error | AxiosError;
+      setError(error instanceof Error ? error : new Error('An error occurred'));
+      console.error(`Failed to fetch data from ${endpoint}`, error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [endpoint, params]);
 
+  useEffect(() => {
     fetchData();
-  }, [endpoint, JSON.stringify(params)]);
+  }, [fetchData]);
 
   return { data, isLoading, error };
 }
